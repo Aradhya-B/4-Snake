@@ -2,8 +2,11 @@
 let cnv;
 // Game board container
 let cnvDiv;
-// Player 1
-let snake1;
+// 4 game sections
+let sec1;
+let sec2;
+let sec3;
+let sec4;
 // Scale of our game (# of grids = (width * height / gridScale^2))
 let gridScale = 20;
 // Food singleton 
@@ -21,38 +24,75 @@ function setup() {
     cnv.parent('canvas-container');
     // Resizing the canvas after setting the parent
     cnv = resizeCanvas(floor(cnvDiv.offsetWidth), floor(cnvDiv.offsetHeight));
-    snake1 = new Snake(0, 0, 255, 0, 0);
+
+    let halfWidth = floor(cnvDiv.offsetWidth / 2);
+    let halfHeight = floor(cnvDiv.offsetHeight / 2);
+    // Creating game sections on canvas with graphics overlay 
+    sec1 = createGraphics(halfWidth, halfHeight);
+    sec1.background(123, 122, 211);
+    sec2 = createGraphics(halfWidth, halfHeight);
+    sec2.background(40, 74, 111);
+    sec3 = createGraphics(halfWidth, halfHeight);
+    sec3.background(243, 74, 111);
+    sec4 = createGraphics(halfWidth, halfHeight);
+    sec4.background(243, 255, 111);
+
+    sec1.snake = new Snake(0, 0, 0, halfWidth - gridScale, 0, halfHeight - gridScale, 255, 0, 0);
+    sec2.snake = new Snake(halfWidth, 0, halfWidth, cnvDiv.offsetWidth - gridScale, 0, halfHeight - gridScale, 0, 255, 0);
+    sec3.snake = new Snake(0, halfHeight, 0, halfWidth, halfHeight, cnvDiv.offsetHeight - gridScale, 255, 0, 255);
+    sec4.snake = new Snake(halfWidth, halfHeight, halfWidth, cnvDiv.offsetWidth - gridScale, halfHeight, cnvDiv.offsetHeight - gridScale, 255, 100, 100);
+
     food = new Food();
     frameRate(30);
 }
 
 // Resize the canvas when the window gets resized 
 function windowResized() {
-    cnvDiv = document.getElementById('canvas-container');
     cnv = resizeCanvas(floor(cnvDiv.offsetWidth), floor(cnvDiv.offsetHeight));
+    sec1 = resizeGraphics(floor(cnvDiv.offsetWidth / 2), floor(cnvDiv.offsetHeight / 2));
+    sec2 = resizeGraphics(floor(cnvDiv.offsetWidth / 2), floor(cnvDiv.offsetHeight / 2));
+    sec3 = resizeGraphics(floor(cnvDiv.offsetWidth / 2), floor(cnvDiv.offsetHeight / 2));
+    sec4 = resizeGraphics(floor(cnvDiv.offsetWidth / 2), floor(cnvDiv.offsetHeight / 2));
 }
 
 function draw() {
-    background(100);
+    background(255);
+
+    image(sec1, 0, 0);
+    image(sec2, floor(cnvDiv.offsetWidth / 2), 0);
+    image(sec3, 0, floor(cnvDiv.offsetHeight / 2));
+    image(sec4, floor(cnvDiv.offsetWidth / 2), floor(cnvDiv.offsetHeight / 2));
+
     snakeOneKeyPressed();
-    snake1.update();
-    snake1.show();
+
+    sec1.snake.update();
+    sec1.snake.show();
+
+    sec2.snake.update();
+    sec2.snake.show();
+
+    sec3.snake.update();
+    sec3.snake.show();
+
+    sec4.snake.update();
+    sec4.snake.show();
+
     food.show();
 }
 
 function snakeOneKeyPressed() {
     if (keyCode === UP_ARROW) {
-        snake1.dir(0, -1);
+        sec1.snake.dir(0, -1);
     } else if (keyCode === DOWN_ARROW) {
-        snake1.dir(0, 1);
+        sec1.snake.dir(0, 1);
     } else if (keyCode === RIGHT_ARROW) {
-        snake1.dir(1, 0);
+        sec1.snake.dir(1, 0);
     } else if (keyCode === LEFT_ARROW) {
-        snake1.dir(-1, 0);
+        sec1.snake.dir(-1, 0);
     }
 }
 
-function Snake(x, y, r, g, b) {
+function Snake(x, y, xConstraint1, xConstraint2, yConstraint1, yConstraint2, r, g, b) {
     this.x = x;
     this.y = y;
     this.xSpeed = 0;
@@ -62,8 +102,8 @@ function Snake(x, y, r, g, b) {
         this.x += this.xSpeed * gridScale;
         this.y += this.ySpeed * gridScale;
 
-        this.x = constrain(this.x, 0, width - gridScale);
-        this.y = constrain(this.y, 0, height - gridScale);
+        this.x = constrain(this.x, xConstraint1, xConstraint2);
+        this.y = constrain(this.y, yConstraint1, yConstraint2);
     }
 
     this.show =  () => {
