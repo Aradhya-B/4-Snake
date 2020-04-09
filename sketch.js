@@ -39,7 +39,7 @@ function setup() {
 
     sec1.snake = new Snake(0, 0, 0, halfWidth - gridScale, 0, halfHeight - gridScale, 255, 0, 0);
     sec2.snake = new Snake(halfWidth, 0, halfWidth, cnvDiv.offsetWidth - gridScale, 0, halfHeight - gridScale, 0, 255, 0);
-    sec3.snake = new Snake(0, halfHeight, 0, halfWidth, halfHeight, cnvDiv.offsetHeight - gridScale, 255, 0, 255);
+    sec3.snake = new Snake(0, halfHeight, 0, halfWidth - gridScale, halfHeight, cnvDiv.offsetHeight - gridScale, 255, 0, 255);
     sec4.snake = new Snake(halfWidth, halfHeight, halfWidth, cnvDiv.offsetWidth - gridScale, halfHeight, cnvDiv.offsetHeight - gridScale, 255, 100, 100);
 
     food = new Food();
@@ -63,7 +63,7 @@ function draw() {
     image(sec3, 0, floor(cnvDiv.offsetHeight / 2));
     image(sec4, floor(cnvDiv.offsetWidth / 2), floor(cnvDiv.offsetHeight / 2));
 
-    snakeOneKeyPressed();
+    snakeKeyPressed();
 
     sec1.snake.update();
     sec1.snake.show();
@@ -80,15 +80,30 @@ function draw() {
     food.show();
 }
 
-function snakeOneKeyPressed() {
+// What happens when the snakes are moved?
+// Could make a set direction function that takes an array of snakes
+// as a rest parameter to improve code reusability 
+function snakeKeyPressed() {
     if (keyCode === UP_ARROW) {
         sec1.snake.dir(0, -1);
+        sec2.snake.dir(0, -1);
+        sec3.snake.dir(0, -1);
+        sec4.snake.dir(0, -1);
     } else if (keyCode === DOWN_ARROW) {
         sec1.snake.dir(0, 1);
+        sec2.snake.dir(0, 1);
+        sec3.snake.dir(0, 1);
+        sec4.snake.dir(0, 1);
     } else if (keyCode === RIGHT_ARROW) {
         sec1.snake.dir(1, 0);
+        sec2.snake.dir(1, 0);
+        sec3.snake.dir(1, 0);
+        sec4.snake.dir(1, 0);
     } else if (keyCode === LEFT_ARROW) {
         sec1.snake.dir(-1, 0);
+        sec2.snake.dir(-1, 0);
+        sec3.snake.dir(-1, 0);
+        sec4.snake.dir(-1, 0);
     }
 }
 
