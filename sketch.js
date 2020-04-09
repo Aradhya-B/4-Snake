@@ -9,8 +9,6 @@ let sec3;
 let sec4;
 // Scale of our game (# of grids = (width * height / gridScale^2))
 let gridScale = 20;
-// Food singleton 
-let food;
 
 // Preloading the div to hold the game board (canvas)
 function preload() {
@@ -42,17 +40,17 @@ function setup() {
     sec3.snake = new Snake(0, halfHeight, 0, halfWidth - gridScale, halfHeight, cnvDiv.offsetHeight - gridScale, 255, 0, 255);
     sec4.snake = new Snake(halfWidth, halfHeight, halfWidth, cnvDiv.offsetWidth - gridScale, halfHeight, cnvDiv.offsetHeight - gridScale, 255, 100, 100);
 
-    food = new Food();
+    sec1.food = new Food();
     frameRate(30);
 }
 
 // Resize the canvas when the window gets resized 
 function windowResized() {
     cnv = resizeCanvas(floor(cnvDiv.offsetWidth), floor(cnvDiv.offsetHeight));
-    sec1 = resizeGraphics(floor(cnvDiv.offsetWidth / 2), floor(cnvDiv.offsetHeight / 2));
-    sec2 = resizeGraphics(floor(cnvDiv.offsetWidth / 2), floor(cnvDiv.offsetHeight / 2));
-    sec3 = resizeGraphics(floor(cnvDiv.offsetWidth / 2), floor(cnvDiv.offsetHeight / 2));
-    sec4 = resizeGraphics(floor(cnvDiv.offsetWidth / 2), floor(cnvDiv.offsetHeight / 2));
+    // sec1 = resizeGraphics(floor(cnvDiv.offsetWidth / 2), floor(cnvDiv.offsetHeight / 2));
+    // sec2 = resizeGraphics(floor(cnvDiv.offsetWidth / 2), floor(cnvDiv.offsetHeight / 2));
+    // sec3 = resizeGraphics(floor(cnvDiv.offsetWidth / 2), floor(cnvDiv.offsetHeight / 2));
+    // sec4 = resizeGraphics(floor(cnvDiv.offsetWidth / 2), floor(cnvDiv.offsetHeight / 2));
 }
 
 function draw() {
@@ -77,7 +75,11 @@ function draw() {
     sec4.snake.update();
     sec4.snake.show();
 
-    food.show();
+    if (sec1.snake.eat(sec1.food.x, sec1.food.y)) {
+        sec1.food = new Food();
+    }
+
+    sec1.food.show();
 }
 
 // What happens when the snakes are moved?
@@ -126,6 +128,17 @@ function Snake(x, y, xConstraint1, xConstraint2, yConstraint1, yConstraint2, r, 
         rect(this.x, this.y, gridScale, gridScale);
     }
 
+    this.eat = (x, y) => {
+        let d = dist(this.x, this.y, x, y);
+        console.log('this.x:', this.x, ', this.y:', this.y, ', x:', x, ', y:', y)
+        console.log(d);
+        if (d < 3) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     this.dir = (x, y) => {
         this.xSpeed = x;
         this.ySpeed = y;
@@ -136,17 +149,17 @@ function Food() {
 
     this.setXLocation = () => {
         let cols = floor(width/gridScale);
-        return floor(random(cols));
+        return floor(random(cols)) * gridScale;
     }
 
     this.setYLocation = () => {
         let rows = floor(height/gridScale);
-        return floor(random(rows));
+        return floor(random(rows)) * gridScale;
     }
 
     this.show = () => {
         fill(0, 0, 255);
-        rect(this.x * gridScale, this.y * gridScale, gridScale, gridScale);
+        rect(this.x, this.y, gridScale, gridScale);
     }
 
     this.x = this.setXLocation();
