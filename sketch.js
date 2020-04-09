@@ -40,7 +40,7 @@ function setup() {
     sec3.snake = new Snake(0, halfHeight, 0, halfWidth - gridScale, halfHeight, cnvDiv.offsetHeight - gridScale, 255, 0, 255);
     sec4.snake = new Snake(halfWidth, halfHeight, halfWidth, cnvDiv.offsetWidth - gridScale, halfHeight, cnvDiv.offsetHeight - gridScale, 255, 100, 100);
 
-    sec1.food = new Food();
+    sec1.food = new Food(0, halfWidth, 0, halfHeight);
     frameRate(30);
 }
 
@@ -56,10 +56,13 @@ function windowResized() {
 function draw() {
     background(255);
 
+    let halfWidth = floor(cnvDiv.offsetWidth / 2);
+    let halfHeight = floor(cnvDiv.offsetHeight / 2);
+
     image(sec1, 0, 0);
-    image(sec2, floor(cnvDiv.offsetWidth / 2), 0);
-    image(sec3, 0, floor(cnvDiv.offsetHeight / 2));
-    image(sec4, floor(cnvDiv.offsetWidth / 2), floor(cnvDiv.offsetHeight / 2));
+    image(sec2, halfWidth, 0);
+    image(sec3, 0, halfHeight);
+    image(sec4, halfWidth, halfHeight);
 
     snakeKeyPressed();
 
@@ -76,7 +79,7 @@ function draw() {
     sec4.snake.show();
 
     if (sec1.snake.eat(sec1.food.x, sec1.food.y)) {
-        sec1.food = new Food();
+        sec1.food = new Food(0, halfWidth, 0, halfHeight);
     }
 
     sec1.food.show();
@@ -130,9 +133,8 @@ function Snake(x, y, xConstraint1, xConstraint2, yConstraint1, yConstraint2, r, 
 
     this.eat = (x, y) => {
         let d = dist(this.x, this.y, x, y);
-        console.log('this.x:', this.x, ', this.y:', this.y, ', x:', x, ', y:', y)
-        console.log(d);
-        if (d < 3) {
+        if (d < 10) {
+            console.log('eaten');
             return true;
         } else {
             return false;
@@ -145,20 +147,25 @@ function Snake(x, y, xConstraint1, xConstraint2, yConstraint1, yConstraint2, r, 
     }
 }
 
-function Food() {
+function Food(xConstraint1, xConstraint2, yConstraint1, yConstraint2) {
 
     this.setXLocation = () => {
-        let cols = floor(width/gridScale);
+        // Get the number of columns based on the grid scale
+        let cols = floor((xConstraint2 - xConstraint1) / gridScale);
+        // Spawn food in a random column
         return floor(random(cols)) * gridScale;
     }
 
     this.setYLocation = () => {
-        let rows = floor(height/gridScale);
+        // Get the number of rows based on the grid scale
+        let rows = floor((yConstraint2 - yConstraint1) / gridScale);
+        // Spawn food in a random row
         return floor(random(rows)) * gridScale;
     }
 
     this.show = () => {
         fill(0, 0, 255);
+        // x-pos, y-pos, width, height
         rect(this.x, this.y, gridScale, gridScale);
     }
 
