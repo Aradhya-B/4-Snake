@@ -27,3 +27,5 @@ http-server -c-1
 Finally, navigate to ```http://localhost:8080/``` on your favorite browser and have fun!
 
 *Note: If you resize your window while playing, just refresh the page and the game boards will adjust as well.*
+
+![](4Snake.gif)
