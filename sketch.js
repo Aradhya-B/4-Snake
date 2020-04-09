@@ -1,5 +1,7 @@
 // Game board
-let canv;
+let cnv;
+// Game board container
+let cnvDiv;
 // Player 1
 let snake1;
 // Scale of our game (# of grids = (width * height / gridScale^2))
@@ -7,16 +9,27 @@ let gridScale = 20;
 // Food singleton 
 let food;
 
+// Preloading the div to hold the game board (canvas)
+function preload() {
+    cnvDiv = document.getElementById('canvas-container');
+}
+
 function setup() {
-    canv = createCanvas(floor(windowWidth / 2), floor(windowHeight / 2));
+    // Creating the canvas (can only have 1 instance)
+    cnv = createCanvas(floor(cnvDiv.offsetWidth), floor(cnvDiv.offsetHeight));
+    // Setting the parent of the canvas 
+    cnv.parent('canvas-container');
+    // Resizing the canvas after setting the parent
+    cnv = resizeCanvas(floor(cnvDiv.offsetWidth), floor(cnvDiv.offsetHeight));
     snake1 = new Snake(0, 0, 255, 0, 0);
-    snake2 = new Snake(width, 0, 0, 255, 0);
     food = new Food();
     frameRate(30);
 }
 
+// Resize the canvas when the window gets resized 
 function windowResized() {
-    canv = resizeCanvas(floor(windowWidth / 2), floor(windowHeight / 2));
+    cnvDiv = document.getElementById('canvas-container');
+    cnv = resizeCanvas(floor(cnvDiv.offsetWidth), floor(cnvDiv.offsetHeight));
 }
 
 function draw() {
