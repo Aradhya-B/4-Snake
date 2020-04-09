@@ -1,8 +1,8 @@
 # 4-Snake
 
-4-Snake is a simple game with a unique take on the timeless classic. Instead of just 1, you're controlling 4 snakes at the same time on 4 different game boards! You can change the difficulty (speed) of the game to your preferences. Built with the JavScript [p5 library](https://github.com/processing/p5.js/).  
+4-Snake is a simple game with a unique take on the timeless classic. Instead of just 1, you're controlling 4 snakes at the same time on 4 different game boards! You can change the difficulty (speed) of the game to your preferences. Built with the JavaScript [p5 library](https://github.com/processing/p5.js/).  
 
-## Installation 
+## Installation
 
 To try 4-Snake for yourself, just clone this git repository.
 
