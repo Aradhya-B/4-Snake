@@ -13,11 +13,15 @@
     <div class="box">
       <div class="header">
         <h1>4-Snake</h1>
-        <select>
-          <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
-          <option value="hard">Hard</option>
-        </select>
+        <div id="diff-and-score">
+          <select id="game-difficulty">
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+            <option value="insane">Insane</option>
+          </select>
+          <h2 id="score">Score:</h2>
+        </div>
       </div>
       <div id="canvas-container">
         <!-- To put p5 canvas-->

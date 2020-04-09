@@ -12,6 +12,14 @@ let sec4;
 // Scale of our game (# of grids = (width * height / gridScale^2))
 let gridScale = 20;
 
+// Selected difficulty maps to framerate
+let difficultyMap = {
+    'easy' : 10,
+    'medium' : 20,
+    'hard' : 35,
+    'insane' : 50
+}
+
 // Preloading the div to hold the game board (canvas)
 function preload() {
     cnvDiv = document.getElementById('canvas-container');
@@ -38,7 +46,7 @@ function setup() {
     sec4 = createGraphics(halfWidth, halfHeight);
     sec4.background(243, 255, 111);
 
-    // Creating a new snake for each section and setting it in the upper left corner of the section
+    // Creating a new snake for each section and setting it in the top left corner of the section
     sec1.snake = new Snake(0, 0, 0, halfWidth - gridScale, 0, halfHeight - gridScale, 255, 0, 0);
     sec2.snake = new Snake(halfWidth, 0, halfWidth, cnvDiv.offsetWidth - gridScale, 0, halfHeight - gridScale, 0, 255, 0);
     sec3.snake = new Snake(0, halfHeight, 0, halfWidth - gridScale, halfHeight, cnvDiv.offsetHeight - gridScale, 255, 0, 255);
@@ -49,9 +57,6 @@ function setup() {
     sec2.food = new Food(halfWidth, cnvDiv.offsetWidth - gridScale, 0, halfHeight - gridScale, 2);
     sec3.food = new Food(0, halfWidth - gridScale, halfHeight, cnvDiv.offsetHeight - gridScale, 3);
     sec4.food = new Food(halfWidth, cnvDiv.offsetWidth - gridScale, halfHeight, cnvDiv.offsetHeight - gridScale, 4);
-
-    // Setting the frame rate *DEPENDS ON DIFFICULTY 
-    frameRate(30);
 }
 
 // Resize the canvas when the window gets resized 
@@ -65,6 +70,10 @@ function draw() {
     // Make the canvas white
     background(255);
 
+    // Setting the frame rate *DEPENDS ON DIFFICULTY 
+    let diff = document.getElementById('game-difficulty').value;
+    frameRate(difficultyMap[diff]);
+
     let halfWidth = floor(cnvDiv.offsetWidth / 2);
     let halfHeight = floor(cnvDiv.offsetHeight / 2);
 
@@ -77,16 +86,20 @@ function draw() {
     // Check if an arrow key is being pressed to move the snakes
     snakeKeyPressed();
 
-    // Update the location of the snakes, and show them on the screen
+    // Monitor if a snake has died, update the location of the snakes, and show them on the screen
+    sec1.snake.death();
     sec1.snake.update();
     sec1.snake.show();
 
+    sec2.snake.death();
     sec2.snake.update();
     sec2.snake.show();
 
+    sec3.snake.death();
     sec3.snake.update();
     sec3.snake.show();
 
+    sec4.snake.death();
     sec4.snake.update();
     sec4.snake.show();
 
@@ -103,6 +116,9 @@ function draw() {
     if (sec4.snake.eat(sec4.food.x, sec4.food.y)) {
         sec4.food = new Food(halfWidth, cnvDiv.offsetWidth - gridScale, halfHeight, cnvDiv.offsetHeight - gridScale, 4);
     }
+
+    let score = document.getElementById('score');
+    score.innerHTML = "Score: " + (sec1.snake.total + sec2.snake.total + sec3.snake.total + sec4.snake.total);
 
     // Show the food overlays
     sec1.food.show();
@@ -144,9 +160,48 @@ function Snake(x, y, xConstraint1, xConstraint2, yConstraint1, yConstraint2, r, 
     this.y = y;
     this.xSpeed = 0;
     this.ySpeed = 0;
+    // Total number of tail pieces
+    this.total = 0;
+    // Array to keep track of the tail
+    this.tail = [];
+
+    this.death = () => {
+        for (let i = 0; i < this.tail.length; i++) {
+            let d = dist(this.x, this.y, this.tail[i].x, this.tail[i].y);
+            if (d < 1) {
+                this.total = 0;
+                this.tail = [];
+            }
+        }
+    }
 
     // Move the snake based on its current speed
     this.update = () => {
+
+        // If the snake has reached a boundary AND is moving in the direction of the boundary, then set it's position to be the opposite boundary
+        if (this.x === xConstraint1 && this.xSpeed === -1 && this.ySpeed === 0) {
+            this.x = xConstraint2;
+        } else if (this.x === xConstraint2 && this.xSpeed === 1 && this.ySpeed === 0) {
+            this.x = xConstraint1;
+        } else if (this.y === yConstraint1 && this.xSpeed === 0 && this.ySpeed === -1) {
+            this.y = yConstraint2;
+        } else if (this.y === yConstraint2 && this.xSpeed === 0 && this.ySpeed === 1) {
+            this.y = yConstraint1;
+        }
+
+        // If we didn't eat something, shift everything, else, just add the snake's old position to the tail
+        if (this.total === this.tail.length) {
+            // Shift the tail by 1 piece to make room for the snakes position one frame ago (new head of the tail)
+            for (let i = 0; i < this.tail.length - 1; i++) {
+                this.tail[i] = this.tail[i + 1];
+            }
+        }
+
+        // Set the beginning of the tail to be the snake's position one frame ago
+        this.tail[this.total - 1] = createVector(this.x, this.y);
+
+
+        // Update the snake's position 
         this.x += this.xSpeed * gridScale;
         this.y += this.ySpeed * gridScale;
 
@@ -155,7 +210,11 @@ function Snake(x, y, xConstraint1, xConstraint2, yConstraint1, yConstraint2, r, 
         this.y = constrain(this.y, yConstraint1, yConstraint2);
     }
 
-    this.show =  () => {
+    this.show = () => {
+        for (let i = 0; i < this.tail.length; i++) {
+            fill(r, g, b);
+            rect(this.tail[i].x, this.tail[i].y, gridScale, gridScale);
+        }
         fill(r, g, b);
         rect(this.x, this.y, gridScale, gridScale);
     }
@@ -164,7 +223,7 @@ function Snake(x, y, xConstraint1, xConstraint2, yConstraint1, yConstraint2, r, 
     this.eat = (x, y) => {
         let d = dist(this.x, this.y, x, y);
         if (d < 10) {
-            console.log('eaten');
+            this.total++;
             return true;
         } else {
             return false;
